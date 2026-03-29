@@ -101,7 +101,7 @@ export default function App() {
                 className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 leading-[0.9]"
               >
                 My Work<br />
-                <span className="text-gradient italic text-3xl md:text-5xl block mt-4 font-display whitespace-nowrap">人々の心に深く刻まれる価値を創出する。</span>
+                <span className="text-gradient italic text-2xl md:text-5xl block mt-4 font-display break-keep leading-tight">人々の心に深く刻まれる価値を創出する。</span>
               </motion.h1>
               <motion.div
                 initial={{ opacity: 0 }}
