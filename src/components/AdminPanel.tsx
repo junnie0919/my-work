@@ -29,8 +29,7 @@ export default function AdminPanel({ isOpen, onClose, portfolio, setPortfolio }:
     const newItem: PortfolioItem = {
       id: Date.now().toString(),
       title: 'New Project',
-      videoUrl: '',
-      thumbnail: 'https://picsum.photos/seed/' + Math.random() + '/800/450'
+      videoUrl: ''
     };
     setPortfolio([...portfolio, newItem]);
   };
@@ -121,8 +120,8 @@ export default function AdminPanel({ isOpen, onClose, portfolio, setPortfolio }:
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-1">
                       <label className="text-[10px] text-white/40 uppercase tracking-widest flex justify-between">
-                        <span>Video URL / Filename</span>
-                        <span className="text-gold/60 italic">Upload to 'public' folder in file explorer first</span>
+                        <span>Video URL / Filename (Supports Vimeo/YouTube)</span>
+                        <span className="text-gold/60 italic">Upload to 'public' folder or paste external link</span>
                       </label>
                       <div className="flex gap-2">
                         <input 

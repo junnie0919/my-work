@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Play, Target, Cpu, BarChart3, X } from "lucide-react";
+import { Play, Target, Cpu, BarChart3, X, Film } from "lucide-react";
 import { PortfolioItem } from "../constants";
 
 export default function PortfolioCard({ item }: { item: PortfolioItem }) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  const getVimeoId = (url: string) => {
+    const match = url.match(/vimeo\.com\/(\d+)/);
+    return match ? match[1] : null;
+  };
+
+  const vimeoId = getVimeoId(item.videoUrl);
+  const isExternalVideo = item.videoUrl.startsWith('http') || item.videoUrl.startsWith('https');
+
+  useEffect(() => {
+    if (vimeoId) {
+      fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${vimeoId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.thumbnail_url) {
+            setThumbnailUrl(data.thumbnail_url);
+          }
+        })
+        .catch(err => console.error("Failed to fetch Vimeo thumbnail:", err));
+    }
+  }, [vimeoId]);
 
   return (
     <>
@@ -15,8 +37,8 @@ export default function PortfolioCard({ item }: { item: PortfolioItem }) {
         className="glass rounded-2xl overflow-hidden group cursor-pointer"
         onClick={() => setIsPlaying(true)}
       >
-        <div className="aspect-video relative overflow-hidden bg-black">
-          {item.videoUrl ? (
+        <div className="aspect-video relative overflow-hidden bg-black/40">
+          {item.videoUrl && !isExternalVideo ? (
             <video 
               src={item.videoUrl}
               muted
@@ -30,13 +52,17 @@ export default function PortfolioCard({ item }: { item: PortfolioItem }) {
               }}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-          ) : (
+          ) : thumbnailUrl ? (
             <img 
-              src={item.thumbnail} 
+              src={thumbnailUrl} 
               alt={item.title} 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               referrerPolicy="no-referrer"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/5 to-white/10">
+              <Film className="text-white/10" size={48} />
+            </div>
           )}
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 flex items-center justify-center transition-all duration-300">
             <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -45,6 +71,11 @@ export default function PortfolioCard({ item }: { item: PortfolioItem }) {
             {!item.videoUrl && (
               <div className="absolute bottom-4 left-4 text-[10px] uppercase tracking-widest text-white/40 bg-black/40 px-2 py-1 rounded">
                 No Video Linked
+              </div>
+            )}
+            {isExternalVideo && (
+              <div className="absolute bottom-4 left-4 text-[10px] uppercase tracking-widest text-white/40 bg-black/40 px-2 py-1 rounded">
+                External Link
               </div>
             )}
           </div>
@@ -83,19 +114,29 @@ export default function PortfolioCard({ item }: { item: PortfolioItem }) {
               </div>
 
               <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/5">
-                <video 
-                  src={item.videoUrl} 
-                  controls 
-                  autoPlay 
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    console.error("Video failed to load:", item.videoUrl);
-                    if (item.videoUrl.startsWith('/')) {
-                      const filename = item.videoUrl.slice(1);
-                      alert(`Video failed to load: ${item.videoUrl}\n\nPlease make sure the file "${filename}" is uploaded to the "public" folder.`);
-                    }
-                  }}
-                />
+                {vimeoId ? (
+                  <iframe
+                    src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1`}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video 
+                    src={item.videoUrl} 
+                    controls 
+                    autoPlay 
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      console.error("Video failed to load:", item.videoUrl);
+                      if (item.videoUrl.startsWith('/')) {
+                        const filename = item.videoUrl.slice(1);
+                        alert(`Video failed to load: ${item.videoUrl}\n\nPlease make sure the file "${filename}" is uploaded to the "public" folder.`);
+                      }
+                    }}
+                  />
+                )}
               </div>
             </motion.div>
           </div>
