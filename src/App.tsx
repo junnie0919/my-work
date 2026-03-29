@@ -127,10 +127,10 @@ export default function App() {
             className="bg-dark pt-20"
           >
             {/* Portfolio Section */}
-            <section id="portfolio" className="py-32 px-6 max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <section id="portfolio" className="py-32 px-6 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 gap-24">
                 {portfolio.map((item) => (
-                  <div key={item.id}>
+                  <div key={item.id} className="w-full">
                     <PortfolioCard item={item} />
                   </div>
                 ))}
